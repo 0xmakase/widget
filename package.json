@@ -53,8 +53,10 @@
         "daisyui": "^3.1.0",
         "dayjs": "^1.11.7",
         "fflate": "^0.8.0",
+        "fireblocks-sdk": "^5.27.2",
         "osmojs": "^15.2.1",
         "ping-widget": "^0.0.33",
+        "vite-plugin-env-compatible": "^2.0.1",
         "vue": "^3.2.47",
         "vue3-webcomponent-wrapper": "^0.2.0"
     },
