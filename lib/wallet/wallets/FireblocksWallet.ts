@@ -1,23 +1,15 @@
 import { Core } from '@walletconnect/core';
-import { Web3Wallet, Web3WalletTypes } from '@walletconnect/web3wallet';
-import { buildApprovedNamespaces, getSdkError } from '@walletconnect/utils';
-// import { fromBase64, fromBech32, toHex } from "@cosmjs/encoding";
-import {
-    Registry,
-    TxBodyEncodeObject,
-    encodePubkey,
-    makeAuthInfoBytes,
-    makeSignDoc,
-} from '@cosmjs/proto-signing';
+import { Web3Wallet } from '@walletconnect/web3wallet';
+import { Registry } from '@cosmjs/proto-signing';
 import { AbstractWallet, Account, WalletArgument, WalletName } from '../Wallet';
 import { Transaction } from '../../utils/type';
-import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
-// import { Any } from "cosmjs-types/google/protobuf/any";
-// import { PubKey } from "cosmjs-types/cosmos/crypto/secp256k1/keys";
-// import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import { AminoTypes, createDefaultAminoConverters } from '@cosmjs/stargate';
-// import { encodeSecp256k1Pubkey, makeSignDoc as makeSignDocAmino } from "@cosmjs/amino";
 import { createWasmAminoConverters } from '@cosmjs/cosmwasm-stargate';
+import {
+    FireblocksSDK,
+    Web3ConnectionFeeLevel,
+    Web3ConnectionType,
+} from 'fireblocks-sdk';
 
 export class FireblocksWallet implements AbstractWallet {
     name: WalletName = WalletName.Fireblocks;
@@ -34,9 +26,10 @@ export class FireblocksWallet implements AbstractWallet {
         this.registry = registry;
     }
 
-    async initialize() {
+    async initializeWeb3Wallet() {
+        console.log(process.env);
         const core = new Core({
-            projectId: process.env.PROJECT_ID,
+            projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID,
         });
 
         this.web3wallet = await Web3Wallet.init({
@@ -53,45 +46,42 @@ export class FireblocksWallet implements AbstractWallet {
     }
 
     // TODO
-    async onSessionProposal({ id, params }: Web3WalletTypes.SessionProposal) {
-        try {
-            const approvedNamespaces = buildApprovedNamespaces({
-                proposal: params,
-                supportedNamespaces: {
-                    cosmos: {
-                        chains: [`cosmos:${this.chainId}`],
-                        methods: [
-                            'cosmos_getAccounts',
-                            'cosmos_signDirect',
-                            'cosmos_signAmino',
-                        ],
-                        events: ['chainChanged', 'accountsChanged'],
-                        // TODO
-                        accounts: [
-                            `cosmos:${this.chainId}:YOUR_ACCOUNT_ADDRESS`,
-                        ],
-                    },
-                },
-            });
-
-            await this.web3wallet.approveSession({
-                id,
-                namespaces: approvedNamespaces,
-            });
-        } catch (error) {
-            console.error('Session proposal error:', error);
-            await this.web3wallet.rejectSession({
-                id,
-                reason: getSdkError('USER_REJECTED'),
-            });
+    async getAccounts(): Promise<Account[]> {
+        if (!this.web3wallet) {
+            await this.initializeWeb3Wallet();
         }
-    }
+        try {
+            const { uri } = await this.web3wallet.core.pairing.create();
 
-    // TODO
-    async onSessionRequest(event: Web3WalletTypes.SessionRequest) {}
+            console.log('WalletConnect URI:', uri);
 
-    // TODO
-    async getAccounts() {
+            const fireblocks = new FireblocksSDK(
+                process.env.VITE_FIREBLOCKS_SECRET_KEY || '',
+                process.env.VITE_FIREBLOCKS_API_KEY || '',
+                process.env.VITE_FIREBLOCKS_API_BASE_URL || ''
+            );
+
+            const connectionResponse = await fireblocks.createWeb3Connection(
+                Web3ConnectionType.WALLET_CONNECT,
+                {
+                    feeLevel: Web3ConnectionFeeLevel.MEDIUM,
+                    vaultAccountId: 0,
+                    uri,
+                }
+            );
+
+            console.log(connectionResponse);
+
+            const result = await fireblocks.submitWeb3Connection(
+                Web3ConnectionType.WALLET_CONNECT,
+                connectionResponse.id,
+                true
+            );
+            console.log(result);
+        } catch (error) {
+            console.error('Error connecting to dApp:', error);
+            throw error;
+        }
         return [];
     }
 
