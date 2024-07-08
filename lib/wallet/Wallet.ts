@@ -8,7 +8,7 @@ import { MetamaskSnapWallet } from './wallets/MetamaskSnapWallet';
 import { LeapWallet } from './wallets/LeapWallet';
 import { OKXWallet } from './wallets/OKXWallet';
 import { UnisatWallet } from './wallets/UnisatWallet';
-import { FireblocksWallet } from './wallets/FireblocksWallet';
+import { WalletConnectWallet } from './wallets/WalletConnectWallet';
 
 export enum WalletName {
     Keplr = 'Keplr',
@@ -19,7 +19,7 @@ export enum WalletName {
     Leap = 'Leap',
     OKX = 'OKX Wallet',
     Unisat = 'UniSat Wallet',
-    Fireblocks = 'Fireblocks',
+    WalletConnect = 'WalletConnect',
     // None Signning
     Address = 'Address',
     NameService = 'Nameservice',
@@ -132,8 +132,8 @@ export function createWallet(
                     arg.hdPath.startsWith("m/44'/60"))
                 ? new MetamaskWallet(arg, reg)
                 : new MetamaskSnapWallet(arg, reg);
-        case WalletName.Fireblocks:
-            return new FireblocksWallet(arg, reg);
+        case WalletName.WalletConnect:
+            return new WalletConnectWallet(arg, reg);
     }
     throw new Error('No wallet connected');
 }
