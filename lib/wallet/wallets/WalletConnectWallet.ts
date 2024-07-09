@@ -31,8 +31,8 @@ import { WalletConnectModal } from '@walletconnect/modal';
 
 const modal = new WalletConnectModal({
     projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
-    // chains: ['cosmos:cosmoshub-4'],
-    chains: ['cosmos:theta-testnet-001'],
+    chains: ['cosmos:cosmoshub-4'],
+    // chains: ['cosmos:theta-testnet-001'],
 });
 
 export class WalletConnectWallet implements AbstractWallet {
@@ -48,7 +48,10 @@ export class WalletConnectWallet implements AbstractWallet {
     });
 
     constructor(arg: WalletArgument, registry: Registry) {
-        this.chainId = arg.chainId || 'cosmos:cosmoshub-4';
+        this.chainId =
+            arg.chainId === 'cosmoshub-4'
+                ? 'cosmos:cosmoshub-4'
+                : arg.chainId || 'cosmos:cosmoshub-4';
         this.registry = registry;
         this.session = null;
         this.signClient = null;
@@ -73,8 +76,8 @@ export class WalletConnectWallet implements AbstractWallet {
                         'cosmos_signDirect',
                         'cosmos_signAmino',
                     ],
-                    // chains: [this.chainId],
-                    chains: ['cosmos:theta-testnet-001'],
+                    chains: [this.chainId],
+                    // chains: ['cosmos:theta-testnet-001'],
                     events: ['chainChanged', 'accountsChanged'],
                 },
             },
@@ -100,8 +103,6 @@ export class WalletConnectWallet implements AbstractWallet {
                 params: {},
             },
         });
-
-        console.log(accounts);
 
         return accounts;
     }
