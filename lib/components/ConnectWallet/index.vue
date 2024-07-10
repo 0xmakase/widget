@@ -10,34 +10,6 @@ import {
 } from '../../../lib/wallet/Wallet';
 import { readWallet } from '../../../lib/wallet/Wallet';
 import { Icon } from '@iconify/vue';
-import { WalletConnectModal } from '@walletconnect/modal';
-import { Core } from '@walletconnect/core';
-import { Web3Wallet } from '@walletconnect/web3wallet';
-
-const modal = new WalletConnectModal({
-    projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
-    chains: ['cosmos:cosmoshub-4'],
-});
-
-const handleOpenWalletConnectModal = async () => {
-    const core = new Core({
-        projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID,
-    });
-
-    const web3wallet = await Web3Wallet.init({
-        core,
-        metadata: {
-            name: 'Fireblocks Wallet',
-            description: 'Fireblocks Wallet for Cosmos',
-            url: 'https://fireblocks.com',
-            icons: [
-                'https://fireblocks.com/wp-content/uploads/2021/04/cropped-favicon-192x192.png',
-            ],
-        },
-    });
-    const { uri } = await web3wallet.core.pairing.create();
-    await modal.openModal({ uri });
-};
 
 const props = defineProps({
     params: String,
@@ -68,6 +40,10 @@ const list = [
     },
     {
         wallet: WalletName.Metamask,
+        logo: 'https://ping.pub/logos/metamask.png',
+    },
+    {
+        wallet: WalletName.WalletConnect,
         logo: 'https://ping.pub/logos/metamask.png',
     },
 ];
@@ -302,11 +278,6 @@ const customKeplr = computed(() => {
                                 />
                             </div>
                         </div>
-                    </li>
-                    <li>
-                        <button @click="handleOpenWalletConnectModal">
-                            WalletConnect
-                        </button>
                     </li>
                 </ul>
                 <div v-show="error" class="text-error mt-3">

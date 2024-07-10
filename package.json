@@ -47,7 +47,7 @@
         "@ping-pub/chain-registry-client": "^0.0.25",
         "@types/bignumber.js": "^5.0.0",
         "@walletconnect/modal": "^2.6.2",
-        "@walletconnect/web3wallet": "^1.12.3",
+        "@walletconnect/sign-client": "^2.13.3",
         "buffer": "^6.0.3",
         "cosmjs-types": "0.9.0",
         "cross-fetch": "^3.1.5",
