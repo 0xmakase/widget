@@ -68,7 +68,7 @@ const NEUTRON: Config = {
 const COSMOS: Config = {
     sender: 'cosmos1jxv0u20scum4trha72c7ltfgfqef6nscj25050',
     endpoint: 'https://rest.cosmos.directory/cosmoshub',
-    chainId: 'cosmoshub-4',
+    chainId: 'cosmos:theta-testnet-001',
     hdPath: "m/44'/118/0'/0/0",
     chainName: 'cosmos',
     params: JSON.stringify({
@@ -78,6 +78,23 @@ const COSMOS: Config = {
         chain_name: 'cosmos',
         contract: 'junovaloper1jxv0u20scum4trha72c7ltfgfqef6nscm9pmg2',
         fees: { amount: '6000', denom: '' },
+    }),
+};
+
+// @ts-ignore
+const COSMOS_TESTNET: Config = {
+    sender: 'cosmos1jxv0u20scum4trha72c7ltfgfqef6nscj25050',
+    endpoint: 'https://rest.sentry-01.theta-testnet.polypore.xyz',
+    chainId: 'cosmos:theta-testnet-001',
+    hdPath: "m/44'/118/0'/0/0",
+    chainName: 'cosmoshub-testnet',
+    params: JSON.stringify({
+        proposal_id: '1',
+        validator_address:
+            'cosmosvaloper1jxv0u20scum4trha72c7ltfgfqef6nsch7q6cu',
+        chain_name: 'cosmoshub-testnet',
+        contract: 'cosmos1jxv0u20scum4trha72c7ltfgfqef6nscm9pmg2',
+        fees: { amount: '5000', denom: 'uatom' },
     }),
 };
 
@@ -113,7 +130,7 @@ const btc: Config = {
     }),
 };
 
-const conf = ref(COSMOS);
+const conf = ref(COSMOS_TESTNET);
 // const conf = ref(btc)
 
 const types = [

@@ -48,10 +48,11 @@ export class WalletConnectWallet implements AbstractWallet {
     });
 
     constructor(arg: WalletArgument, registry: Registry) {
-        this.chainId =
-            arg.chainId === 'cosmoshub-4'
-                ? 'cosmos:cosmoshub-4'
-                : arg.chainId || 'cosmos:cosmoshub-4';
+        // this.chainId =
+        //     arg.chainId === 'cosmoshub-4'
+        //         ? 'cosmos:cosmoshub-4'
+        //         : arg.chainId || 'cosmos:cosmoshub-4';
+        this.chainId = 'cosmos:theta-testnet-001';
         this.registry = registry;
         this.session = null;
         this.signClient = null;
@@ -76,8 +77,8 @@ export class WalletConnectWallet implements AbstractWallet {
                         'cosmos_signDirect',
                         'cosmos_signAmino',
                     ],
-                    chains: [this.chainId],
-                    // chains: ['cosmos:theta-testnet-001'],
+                    // chains: [this.chainId],
+                    chains: ['cosmos:theta-testnet-001'],
                     events: ['chainChanged', 'accountsChanged'],
                 },
             },
@@ -128,9 +129,7 @@ export class WalletConnectWallet implements AbstractWallet {
 
         const pubkey = Any.fromPartial({
             typeUrl: keyType(transaction.chainId),
-            value: PubKey.encode({
-                key: accountFromSigner.pubkey,
-            }).finish(),
+            value: accountFromSigner.pubkey,
         });
 
         const txBodyEncodeObject: TxBodyEncodeObject = {
@@ -182,9 +181,7 @@ export class WalletConnectWallet implements AbstractWallet {
 
         const pubkey = Any.fromPartial({
             typeUrl: keyType(tx.chainId),
-            value: PubKey.encode({
-                key: accountFromSigner.pubkey,
-            }).finish(),
+            value: accountFromSigner.pubkey,
         });
 
         const msgs = tx.messages.map((msg) => this.aminoTypes.toAmino(msg));
@@ -209,6 +206,7 @@ export class WalletConnectWallet implements AbstractWallet {
                     },
                 },
             });
+        console.log(signature, signed);
 
         const signedTxBody = {
             messages: signed.msgs.map((msg) => this.aminoTypes.fromAmino(msg)),
@@ -232,10 +230,12 @@ export class WalletConnectWallet implements AbstractWallet {
             signed.fee.payer,
             SignMode.SIGN_MODE_LEGACY_AMINO_JSON
         );
-        return TxRaw.fromPartial({
+        const txRaw = TxRaw.fromPartial({
             bodyBytes: signedTxBodyBytes,
             authInfoBytes: signedAuthInfoBytes,
             signatures: [fromBase64(signature.signature)],
         });
+        console.log(txRaw);
+        return txRaw;
     }
 }
