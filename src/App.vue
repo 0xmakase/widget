@@ -68,7 +68,7 @@ const NEUTRON: Config = {
 const COSMOS: Config = {
     sender: 'cosmos1jxv0u20scum4trha72c7ltfgfqef6nscj25050',
     endpoint: 'https://rest.cosmos.directory/cosmoshub',
-    chainId: 'cosmos:theta-testnet-001',
+    chainId: 'cosmoshub-4',
     hdPath: "m/44'/118/0'/0/0",
     chainName: 'cosmos',
     params: JSON.stringify({
