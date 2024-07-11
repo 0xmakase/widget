@@ -193,6 +193,7 @@ export class WalletConnectWallet implements AbstractWallet {
             tx.signerData.accountNumber,
             tx.signerData.sequence
         );
+        console.log(signDoc);
 
         const { signature, signed } =
             await this.signClient!.request<AminoSignResponse>({
