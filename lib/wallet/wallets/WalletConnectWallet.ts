@@ -178,7 +178,13 @@ export class WalletConnectWallet implements AbstractWallet {
 
     async signAmino(tx: Transaction): Promise<TxRaw> {
         const accounts = await this.getAccounts();
-        const accountFromSigner = accounts[0];
+        const hex = toHex(fromBech32(tx.signerAddress).data);
+        const accountFromSigner = accounts.find(
+            (account) => toHex(fromBech32(account.address).data) === hex
+        );
+        if (!accountFromSigner) {
+            throw new Error('Failed to retrieve account from signer');
+        }
         // base64 decode
         const pubKeyBytes = fromBase64(accountFromSigner.pubkey.toString());
         // secp256k1
@@ -199,7 +205,6 @@ export class WalletConnectWallet implements AbstractWallet {
             tx.signerData.accountNumber,
             tx.signerData.sequence
         );
-        console.log(signDoc);
 
         const { signature, signed } =
             await this.signClient!.request<AminoSignResponse>({
@@ -213,7 +218,6 @@ export class WalletConnectWallet implements AbstractWallet {
                     },
                 },
             });
-        console.log(signature, signed);
 
         const signedTxBody = {
             messages: signed.msgs.map((msg) => this.aminoTypes.fromAmino(msg)),
@@ -242,7 +246,6 @@ export class WalletConnectWallet implements AbstractWallet {
             authInfoBytes: signedAuthInfoBytes,
             signatures: [fromBase64(signature.signature)],
         });
-        console.log(txRaw);
         return txRaw;
     }
 }

@@ -83,7 +83,7 @@ const COSMOS: Config = {
 
 // @ts-ignore
 const COSMOS_TESTNET: Config = {
-    sender: 'cosmos1jxv0u20scum4trha72c7ltfgfqef6nscj25050',
+    sender: 'cosmos1ev0lc0392t3hy9zdceg0yregv27pjcs68usrp4',
     endpoint: 'https://rest.sentry-01.theta-testnet.polypore.xyz',
     chainId: 'cosmos:theta-testnet-001',
     hdPath: "m/44'/118/0'/0/0",
