@@ -40,8 +40,8 @@ export class WalletConnectWallet implements AbstractWallet {
     chainId: string;
     registry: Registry;
     conf: WalletArgument;
-    signClient: SignClient | null;
-    session: SessionTypes.Struct | null;
+    signClient: SignClient | null = null;
+    session: SessionTypes.Struct | null = null;
     aminoTypes = new AminoTypes({
         ...createDefaultAminoConverters(),
         ...createWasmAminoConverters(),
@@ -53,8 +53,6 @@ export class WalletConnectWallet implements AbstractWallet {
                 ? 'cosmos:cosmoshub-4'
                 : arg.chainId || 'cosmos:cosmoshub-4';
         this.registry = registry;
-        this.session = null;
-        this.signClient = null;
         this.conf = arg;
     }
 
@@ -68,6 +66,15 @@ export class WalletConnectWallet implements AbstractWallet {
                 icons: ['https://my-cosmos-dapp.com/icon.png'],
             },
         });
+
+        // NOTE: Restore session SEE: https://docs.walletconnect.com/api/sign/dapp-usage#restoring-a-session
+        const lastKeyIndex = this.signClient.session.getAll().length - 1;
+        const lastSession = this.signClient.session.getAll()[lastKeyIndex];
+        if (lastSession) {
+            this.session = lastSession;
+            return;
+        }
+
         const { uri, approval } = await this.signClient.connect({
             requiredNamespaces: {
                 cosmos: {
