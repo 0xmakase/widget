@@ -1,6 +1,7 @@
 import SignClient from '@walletconnect/sign-client';
 import { SessionTypes } from '@walletconnect/types';
 import { fromBase64 } from '@cosmjs/encoding';
+import { Secp256k1 } from '@cosmjs/crypto';
 import {
     type Registry,
     type TxBodyEncodeObject,
@@ -205,11 +206,14 @@ export class WalletConnectWallet implements AbstractWallet {
     async signAmino(tx: Transaction): Promise<TxRaw> {
         const accounts = await this.getAccounts();
         const accountFromSigner = accounts[0];
-
+        // base64 decode
+        const pubKeyBytes = fromBase64(accountFromSigner.pubkey.toString());
+        // secp256k1
+        const compressedPubkey = Secp256k1.compressPubkey(pubKeyBytes);
         const pubkey = Any.fromPartial({
             typeUrl: keyType(tx.chainId),
             value: PubKey.encode({
-                key: accountFromSigner.pubkey,
+                key: compressedPubkey,
             }).finish(),
         });
 
