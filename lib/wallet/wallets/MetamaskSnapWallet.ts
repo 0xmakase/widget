@@ -5,11 +5,7 @@ import {
     WalletName,
     keyType,
 } from '../Wallet';
-import {
-    fromBase64,
-    fromBech32,
-    toHex,
-} from '@cosmjs/encoding';
+import { fromBase64, fromBech32, toHex } from '@cosmjs/encoding';
 import {
     Registry,
     TxBodyEncodeObject,
@@ -22,14 +18,19 @@ import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import { PubKey } from 'cosmjs-types/cosmos/crypto/secp256k1/keys';
 
-import { connectSnap, getKey, getSnap, CosmjsOfflineSigner } from '@leapwallet/cosmos-snap-provider';
+import {
+    connectSnap,
+    getKey,
+    getSnap,
+    CosmjsOfflineSigner,
+} from '@leapwallet/cosmos-snap-provider';
 // import { createWasmAminoConverters } from "@cosmjs/cosmwasm-stargate";
 
 export class MetamaskSnapWallet implements AbstractWallet {
     name: WalletName.MetamaskSnap;
     chainId: string;
     registry: Registry;
-    prefix: string;    
+    prefix: string;
     // aminoTypes = new AminoTypes( {...createDefaultAminoConverters(), ...createWasmAminoConverters()});
 
     constructor(arg: WalletArgument, registry: Registry) {
@@ -43,11 +44,13 @@ export class MetamaskSnapWallet implements AbstractWallet {
             throw new Error('Metamask snap not installed');
         });
         if (!snapInstalled) {
-            await connectSnap()
+            await connectSnap();
         }
-        const key = await getKey(this.chainId)
-        return [key]
+        const key = await getKey(this.chainId);
+        return [key];
     }
+
+    async disconnect(): Promise<void> {}
 
     async supportCoinType(coinType?: string): Promise<boolean> {
         return true;
@@ -94,7 +97,10 @@ export class MetamaskSnapWallet implements AbstractWallet {
         );
 
         const offlineSigner = new CosmjsOfflineSigner(this.chainId);
-        const { signature, signed } = await offlineSigner.signDirect(transaction.signerAddress, signDoc);
+        const { signature, signed } = await offlineSigner.signDirect(
+            transaction.signerAddress,
+            signDoc
+        );
 
         return TxRaw.fromPartial({
             bodyBytes: signed.bodyBytes,

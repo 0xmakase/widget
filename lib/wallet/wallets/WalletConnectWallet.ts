@@ -32,7 +32,6 @@ import { WalletConnectModal } from '@walletconnect/modal';
 const modal = new WalletConnectModal({
     projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
     chains: ['cosmos:cosmoshub-4'],
-    // chains: ['cosmos:theta-testnet-001'],
 });
 
 export class WalletConnectWallet implements AbstractWallet {
@@ -56,7 +55,7 @@ export class WalletConnectWallet implements AbstractWallet {
         this.conf = arg;
     }
 
-    async connect() {
+    async initSignClient() {
         this.signClient = await SignClient.init({
             projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
             metadata: {
@@ -66,16 +65,22 @@ export class WalletConnectWallet implements AbstractWallet {
                 icons: ['https://my-cosmos-dapp.com/icon.png'],
             },
         });
+    }
+
+    async connect() {
+        if (!this.signClient) {
+            await this.initSignClient();
+        }
 
         // NOTE: Restore session SEE: https://docs.walletconnect.com/api/sign/dapp-usage#restoring-a-session
-        const lastKeyIndex = this.signClient.session.getAll().length - 1;
-        const lastSession = this.signClient.session.getAll()[lastKeyIndex];
+        const lastKeyIndex = this.signClient!.session.getAll().length - 1;
+        const lastSession = this.signClient!.session.getAll()[lastKeyIndex];
         if (lastSession) {
             this.session = lastSession;
             return;
         }
 
-        const { uri, approval } = await this.signClient.connect({
+        const { uri, approval } = await this.signClient!.connect({
             requiredNamespaces: {
                 cosmos: {
                     methods: [
@@ -92,9 +97,23 @@ export class WalletConnectWallet implements AbstractWallet {
 
         if (uri) {
             await modal.openModal({ uri });
+            this.session = await approval();
+            modal.closeModal();
         }
+    }
 
-        this.session = await approval();
+    async disconnect() {
+        if (!this.session) {
+            await this.connect();
+        }
+        await this.signClient!.disconnect({
+            topic: this.session!.topic,
+            reason: {
+                code: 6000,
+                message: 'User disconnected',
+            },
+        });
+        this.session = null;
     }
 
     async getAccounts(): Promise<Account[]> {
