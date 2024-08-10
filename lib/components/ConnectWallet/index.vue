@@ -125,7 +125,11 @@ async function connect() {
     sending.value = false;
 }
 
-function disconnect() {
+async function disconnect() {
+    if (connected.value.wallet === 'WalletConnect') {
+        const wa = createWallet(connected.value.wallet, {});
+        await wa.disconnect();
+    }
     removeWallet(props.hdPath);
     emit('disconnect', { value: connected.value });
     connected.value = {} as ConnectedWallet;
