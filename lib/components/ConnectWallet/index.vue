@@ -95,6 +95,9 @@ async function connect() {
             hdPath: props.hdPath,
             prefix: props.addrPrefix,
         });
+        if (name.value === 'WalletConnect') {
+            open.value = false;
+        }
         await wa
             .getAccounts()
             .then((x) => {
