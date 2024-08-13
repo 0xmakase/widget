@@ -67,6 +67,7 @@ export interface AbstractWallet {
     getAccounts(): Promise<Account[]>;
     supportCoinType(coinType?: string): Promise<boolean>;
     sign(transaction: Transaction): Promise<any>;
+    disconnect(): Promise<void>;
 }
 
 export const DEFAULT_HDPATH = "m/44'/118/0'/0/0";

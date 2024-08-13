@@ -44,7 +44,8 @@ const list = [
     },
     {
         wallet: WalletName.WalletConnect,
-        logo: 'https://ping.pub/logos/metamask.png',
+        // SEE: https://github.com/WalletConnect/walletconnect-assets/tree/master
+        logo: 'data:image/svg+xml,%3Csvg%20fill%3D%22none%22%20height%3D%22332%22%20viewBox%3D%220%200%20480%20332%22%20width%3D%22480%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m126.613%2093.9842c62.622-61.3123%20164.152-61.3123%20226.775%200l7.536%207.3788c3.131%203.066%203.131%208.036%200%2011.102l-25.781%2025.242c-1.566%201.533-4.104%201.533-5.67%200l-10.371-10.154c-43.687-42.7734-114.517-42.7734-158.204%200l-11.107%2010.874c-1.565%201.533-4.103%201.533-5.669%200l-25.781-25.242c-3.132-3.066-3.132-8.036%200-11.102zm280.093%2052.2038%2022.946%2022.465c3.131%203.066%203.131%208.036%200%2011.102l-103.463%20101.301c-3.131%203.065-8.208%203.065-11.339%200l-73.432-71.896c-.783-.767-2.052-.767-2.835%200l-73.43%2071.896c-3.131%203.065-8.208%203.065-11.339%200l-103.4657-101.302c-3.1311-3.066-3.1311-8.036%200-11.102l22.9456-22.466c3.1311-3.065%208.2077-3.065%2011.3388%200l73.4333%2071.897c.782.767%202.051.767%202.834%200l73.429-71.897c3.131-3.065%208.208-3.065%2011.339%200l73.433%2071.897c.783.767%202.052.767%202.835%200l73.431-71.895c3.132-3.066%208.208-3.066%2011.339%200z%22%20fill%3D%22%233396ff%22%2F%3E%3C%2Fsvg%3E',
     },
 ];
 
@@ -95,6 +96,9 @@ async function connect() {
             hdPath: props.hdPath,
             prefix: props.addrPrefix,
         });
+        if (name.value === 'WalletConnect') {
+            open.value = false;
+        }
         await wa
             .getAccounts()
             .then((x) => {
@@ -122,7 +126,11 @@ async function connect() {
     sending.value = false;
 }
 
-function disconnect() {
+async function disconnect() {
+    if (connected.value.wallet === 'WalletConnect') {
+        const wa = createWallet(connected.value.wallet, {});
+        await wa.disconnect();
+    }
     removeWallet(props.hdPath);
     emit('disconnect', { value: connected.value });
     connected.value = {} as ConnectedWallet;
