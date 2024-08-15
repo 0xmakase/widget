@@ -6,10 +6,15 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import inject from '@rollup/plugin-inject';
+import env from 'vite-plugin-env-compatible';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [vue(), cssInjectedByJsPlugin()],
+    plugins: [
+        vue(),
+        cssInjectedByJsPlugin(),
+        env({ prefix: 'VITE', mountedPath: 'process.env' }),
+    ],
     resolve: {
         preserveSymlinks: true,
         alias: {
