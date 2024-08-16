@@ -54,7 +54,7 @@ export class WalletConnectWallet implements AbstractWallet {
             projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
             chains: [arg.chainId === 'cosmoshub-4' 
                 ? 'cosmos:cosmoshub-4'
-                : arg.chainId || 'cosmos:cosmoshub-4'],
+                : 'cosmos:' + arg.chainId || 'cosmos:cosmoshub-4'],
         });
     }
 
