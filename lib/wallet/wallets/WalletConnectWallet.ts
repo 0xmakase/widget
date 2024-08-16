@@ -30,11 +30,6 @@ import {
 import { createWasmAminoConverters } from '@cosmjs/cosmwasm-stargate';
 import { WalletConnectModal } from '@walletconnect/modal';
 
-const modal = new WalletConnectModal({
-    projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
-    chains: ['cosmos:cosmoshub-4'],
-});
-
 export class WalletConnectWallet implements AbstractWallet {
     name: WalletName = WalletName.WalletConnect;
     chainId: string;
@@ -46,6 +41,7 @@ export class WalletConnectWallet implements AbstractWallet {
         ...createDefaultAminoConverters(),
         ...createWasmAminoConverters(),
     });
+    modal: WalletConnectModal;
 
     constructor(arg: WalletArgument, registry: Registry) {
         this.chainId =
@@ -54,6 +50,12 @@ export class WalletConnectWallet implements AbstractWallet {
                 : arg.chainId || 'cosmos:cosmoshub-4';
         this.registry = registry;
         this.conf = arg;
+        this.modal = new WalletConnectModal({
+            projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
+            chains: [arg.chainId === 'cosmoshub-4' 
+                ? 'cosmos:cosmoshub-4'
+                : arg.chainId || 'cosmos:cosmoshub-4'],
+        });
     }
 
     async initSignClient() {
@@ -90,16 +92,15 @@ export class WalletConnectWallet implements AbstractWallet {
                         'cosmos_signAmino',
                     ],
                     chains: [this.chainId],
-                    // chains: ['cosmos:theta-testnet-001'],
                     events: ['chainChanged', 'accountsChanged'],
                 },
             },
         });
 
         if (uri) {
-            await modal.openModal({ uri });
+            await this.modal.openModal({ uri });
             this.session = await approval();
-            modal.closeModal();
+            this.modal.closeModal();
         }
     }
 
@@ -206,9 +207,7 @@ export class WalletConnectWallet implements AbstractWallet {
     async signAmino(tx: Transaction): Promise<TxRaw> {
         const accounts = await this.getAccounts();
         const accountFromSigner = accounts[0];
-        // base64 decode
         const pubKeyBytes = fromBase64(accountFromSigner.pubkey.toString());
-        // secp256k1
         const compressedPubkey = Secp256k1.compressPubkey(pubKeyBytes);
         const pubkey = Any.fromPartial({
             typeUrl: keyType(tx.chainId),
