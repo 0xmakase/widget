@@ -47,15 +47,14 @@ export class WalletConnectWallet implements AbstractWallet {
         this.chainId =
             arg.chainId === 'cosmoshub-4'
                 ? 'cosmos:cosmoshub-4'
-                : arg.chainId || 'cosmos:cosmoshub-4';
+                : 'cosmos:' + arg.chainId || 'cosmos:cosmoshub-4';
         this.registry = registry;
         this.conf = arg;
         this.modal = new WalletConnectModal({
             projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
-            chains: [arg.chainId === 'cosmoshub-4' 
-                ? 'cosmos:cosmoshub-4'
-                : 'cosmos:' + arg.chainId || 'cosmos:cosmoshub-4'],
+            chains: [this.chainId],
         });
+        console.log('WalletConnectWallet', this.chainId);
     }
 
     async initSignClient() {
