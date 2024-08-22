@@ -60,10 +60,13 @@ export class WalletConnectWallet implements AbstractWallet {
         this.signClient = await SignClient.init({
             projectId: process.env.VITE_WALLET_CONNECT_PROJECT_ID || '',
             metadata: {
-                name: 'TODO My Cosmos dApp',
-                description: 'TODO A dApp for Cosmos',
-                url: 'https://my-cosmos-dapp.com',
-                icons: ['https://my-cosmos-dapp.com/icon.png'],
+                name: 'Omakase Explorer',
+                description:
+                    'OmakaseのValidatorとして運用しているブロックチェーンのエクスプローラー',
+                url: 'https://omakase-explorer.web.app',
+                icons: [
+                    'https://raw.githubusercontent.com/0xmakase/blockscout/master/apps/block_scout_web/assets/static/images/omakase-symbol.svg',
+                ],
             },
         });
     }
