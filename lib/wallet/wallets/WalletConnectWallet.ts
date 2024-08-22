@@ -45,9 +45,9 @@ export class WalletConnectWallet implements AbstractWallet {
 
     constructor(arg: WalletArgument, registry: Registry) {
         this.chainId =
-            arg.chainId === 'cosmoshub-4'
-                ? 'cosmos:cosmoshub-4'
-                : 'cosmos:' + arg.chainId || 'cosmos:cosmoshub-4';
+            arg.chainId === 'cosmoshub-4' || arg.chainId === 'dymension_1100-1'
+                ? 'cosmos:' + arg.chainId
+                : arg.chainId || 'cosmos:cosmoshub-4';
         this.registry = registry;
         this.conf = arg;
         this.modal = new WalletConnectModal({
