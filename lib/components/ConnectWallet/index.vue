@@ -24,6 +24,10 @@ const sending = ref(false);
 const open = ref(false);
 const error = ref('');
 
+const walletConnectAvailableChainIds = [
+    'dymension_1100-1', // Dymension mainnet
+];
+
 const name = ref(WalletName.Keplr);
 const list = [
     {
@@ -76,7 +80,11 @@ if (props.params) {
 async function initData() {}
 
 const walletList = computed(() => {
-    // const l = list
+    const enabledWalletConnect = walletConnectAvailableChainIds.includes(
+        props.chainId || ''
+    );
+    if (!enabledWalletConnect)
+        return list.filter(({ wallet }) => wallet !== WalletName.WalletConnect);
     return list;
 });
 
